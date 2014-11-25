@@ -432,6 +432,47 @@ function getLinearRegressionFunction(xAxisCategory, xAxisVariable, yAxisCategory
 	}
 }
 
+function getColumns(xAxisCategory, xAxisVariable, yAxisCategory, yAxisVariable)
+{
+	var toReturn = {};
+	var header = [];
+	header.push("x");
+	var x = [];
+	x.push("x");
+	var y = [];
+	y.push("y");
+	
+	try {
+		var xAxisVar = data[xAxisCategory][xAxisVariable];
+		var yAxisVar = data[yAxisCategory][yAxisVariable];
+		if (xAxisVar == null || yAxisVar == null)
+		{
+			return -1;
+		}
+		else
+		{
+			for (var countryVal in xAxisVar)
+			{
+				if (xAxisVar[countryVal] != null && yAxisVar[countryVal] != null)
+				{
+					header.push(countryVal);
+					x.push(xAxisVar[countryVal]);
+					y.push(yAxisVar[countryVal]);
+				}
+			}
+			toReturn.header = header;
+			toReturn.x = x;
+			toReturn.y = y;
+			
+			return toReturn;
+		}
+	}
+	catch(err) {
+		return -1;
+	}
+	
+}
+
 function getRankedValues(categoryName, variableName, desc)
 {
 	var array = [];
@@ -475,6 +516,22 @@ function getRankedValues(categoryName, variableName, desc)
 	catch(err) {
 		return -1;
 	}
+}
+
+function getVariableNames()
+{
+	var toReturn = [];
+	for (var category in data)
+	{
+		for (var varName in data[category])
+		{
+			var newObj = {};
+			newObj.category = category;
+			newObj.varName = varName;
+			toReturn.push(newObj);
+		}
+	}
+	return toReturn;
 }
 
 

@@ -1,10 +1,132 @@
 <html>
 <head>
+	<link href="c3.min.css" rel="stylesheet" type="text/css">
+	
 	<script type="text/javascript" src="jquery-1.11.1.min.js"></script>
 	<script type="text/javascript" src="simple_statistics.js"></script>
+	<script src="d3.min.js" charset="utf-8"></script>
+	<script src="c3.min.js"></script>
 	<script type="text/javascript" src="data.js"></script>
 </head>
 <body>
+	<p>X-Axis:</p><select id="chooseX">
+	</select>
+	<p>Y-Axis:</p><select id="chooseY">
+	</select>
+	<p id="mismatch">MISMATCH</p>
+	<br>
+	<div id="chart"></div>
+	
+	<script>
+		$("#mismatch").hide();
+		var variables = getVariableNames();
+		var xCategory = "statistics";
+		var xVarName = "GDP Per Capita";
+		var yCategory = "statistics";
+		var yVarName = "Life Expectancy At Birth";
+		var xIndex = 26;
+		var yIndex = 22;
+		
+		$.each(variables, function( index, value ) {
+			$('#chooseX').append("<option>"+value.category+": "+value.varName+"</option>");
+			});
+			
+		$("#chooseX").on('change',
+				function(){	//when selection changes...
+					var index = (parseInt($("#chooseX")[0].selectedIndex));
+					console.log("selected index: "+index);
+					
+					var newCategory = variables[index].category;
+					var newVarName = variables[index].varName;
+					var newColumns = getColumns(newCategory, newVarName, yCategory, yVarName);
+					if (newColumns == -1)
+					{
+						$("#mismatch").show();
+						$("#chooseX")[0].selectedIndex = xIndex;
+					}
+					else
+					{
+						xCategory = newCategory;
+						xVarName = newVarName;
+						xIndex = index;
+						
+						chart.load({
+						columns: [
+							newColumns.x,
+							newColumns.y
+						]
+						});
+					}
+					}
+				);
+		$("#chooseX")[0].selectedIndex = xIndex;
+		
+		$.each(variables, function( index, value ) {
+			$('#chooseY').append("<option>"+value.category+": "+value.varName+"</option>");
+			});
+
+			
+		$("#chooseY").on('change',
+				function(){	//when selection changes...
+					var index = (parseInt($("#chooseY")[0].selectedIndex));
+					console.log("selected index: "+index);
+					
+					var newCategory = variables[index].category;
+					var newVarName = variables[index].varName;
+					var newColumns = getColumns(xCategory, xVarName, newCategory, newVarName);
+					if (newColumns == -1)
+					{
+						$("#mismatch").show();
+						$("#chooseY")[0].selectedIndex = yIndex;
+					}
+					else
+					{
+						yCategory = newCategory;
+						yVarName = newVarName;
+						yIndex = index;
+						
+						chart.load({
+						columns: [
+							newColumns.x,
+							newColumns.y
+						]
+						});
+					}
+					}
+				);
+				
+		$("#chooseY")[0].selectedIndex = yIndex;
+		
+		var columns = getColumns(xCategory, xVarName, yCategory, yVarName);
+		console.log(columns);
+		
+		var chart = c3.generate({
+		data: {
+        xs: {
+            y: 'x',
+        },
+
+        columns: [
+			columns.header,
+            columns.x,
+            columns.y
+        ],
+        type: 'scatter'
+		},
+		axis: {
+        x: {
+            tick: {
+                fit: false
+            }
+        },
+        y: {
+            
+        }
+    }
+});
+	</script>
+	
+	
 	
 </body>
 </html>
