@@ -436,11 +436,11 @@ function getColumns(xAxisCategory, xAxisVariable, yAxisCategory, yAxisVariable)
 {
 	var toReturn = {};
 	var header = [];
-	header.push("x");
+	header.push('x');
 	var x = [];
-	x.push("x");
+	x.push(xAxisVariable);
 	var y = [];
-	y.push("y");
+	y.push(yAxisVariable);
 	
 	try {
 		var xAxisVar = data[xAxisCategory][xAxisVariable];

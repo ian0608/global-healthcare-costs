@@ -14,7 +14,7 @@
 	<p>Y-Axis:</p><select id="chooseY">
 	</select>
 	<p id="mismatch">MISMATCH</p>
-	<br>
+	<br><br><br>
 	<div id="chart"></div>
 	
 	<script>
@@ -50,12 +50,7 @@
 						xVarName = newVarName;
 						xIndex = index;
 						
-						chart.load({
-						columns: [
-							newColumns.x,
-							newColumns.y
-						]
-						});
+						createChart();
 					}
 					}
 				);
@@ -85,45 +80,67 @@
 						yVarName = newVarName;
 						yIndex = index;
 						
-						chart.load({
-						columns: [
-							newColumns.x,
-							newColumns.y
-						]
-						});
+						createChart();
 					}
 					}
 				);
 				
 		$("#chooseY")[0].selectedIndex = yIndex;
 		
-		var columns = getColumns(xCategory, xVarName, yCategory, yVarName);
+		function createChart()
+		{
+			var columns = getColumns(xCategory, xVarName, yCategory, yVarName);
 		console.log(columns);
 		
-		var chart = c3.generate({
+		var xLookup = {};
+		$.each(columns.x, function( index, value ) {
+			if (index > 0)
+			{
+				xLookup[value] = columns.header[index];
+			}
+			});
+		
+		var options = {
 		data: {
-        xs: {
-            y: 'x',
-        },
-
         columns: [
-			columns.header,
             columns.x,
             columns.y
         ],
         type: 'scatter'
 		},
+		tooltip: {
+		contents: function(d, defaultTitleFormat, defaultValueFormat, color)
+		{
+			var country = xLookup[d[0].x];
+			console.log(d);
+			return country + "<br>" + columns.x[0] + ": " + d[0].x + "<br>" + columns.y[0] + ": " + d[0].value;
+		}
+		},
+		legend: {
+			show: false
+		},
+		point: { r: 8 },
 		axis: {
         x: {
+			label: xVarName,
             tick: {
                 fit: false
             }
         },
-        y: {
-            
-        }
-    }
-});
+		y: {
+			label: yVarName
+			}
+		
+	}};
+		var xs = {
+			}
+		xs[columns.y[0]] = columns.x[0];
+		options['data']['xs'] = xs;
+		console.log(xs);
+		var chart = c3.generate(options);
+		}
+		
+		createChart();
 	</script>
 	
 	
