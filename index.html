@@ -87,12 +87,93 @@
 				
 		$("#chooseY")[0].selectedIndex = yIndex;
 		
-		function createChart()
+		var xLookup = {}; //won't work if multiple countries share same value
+		var columns = {};
+		
+		function highlightPoint(x, y)
 		{
-			var columns = getColumns(xCategory, xVarName, yCategory, yVarName);
+			createChartWithHighlights(['highlightX', x], ['highlightY', y]);
+		}
+		
+		
+		function highlightCountry(countryName)
+		{
+			$.each(columns.header, function( index, value ) {
+				if (value == countryName)
+				{
+					highlightPoint(columns.x[index], columns.y[index]);
+					return;
+				}
+			});
+		}
+		
+		
+		function createChartWithHighlights(highlightX, highlightY)
+		{
+			columns = getColumns(xCategory, xVarName, yCategory, yVarName);
 		console.log(columns);
 		
-		var xLookup = {};
+		xLookup = {};
+		$.each(columns.x, function( index, value ) {
+			if (index > 0)
+			{
+				xLookup[value] = columns.header[index];
+			}
+			});
+		
+		var options = {
+		data: {
+        columns: [
+            columns.x,
+            columns.y,
+			highlightX,
+			highlightY
+        ],
+        type: 'scatter',
+		onclick: function (d, i) { 
+			var countryClicked = xLookup[d.x];
+			console.log(countryClicked); },
+		},
+		tooltip: {
+		contents: function(d, defaultTitleFormat, defaultValueFormat, color)
+		{
+			var country = xLookup[d[0].x];	
+			console.log(d);
+			return country + "<br>" + columns.x[0] + ": " + d[0].x + "<br>" + columns.y[0] + ": " + d[0].value;
+		}
+		},
+		legend: {
+			show: true
+		},
+		point: { r: 8 },
+		axis: {
+        x: {
+			label: xVarName,
+            tick: {
+                fit: false
+            }
+        },
+		y: {
+			label: yVarName
+			}
+		
+	}};
+		
+		var xs = {
+			}
+		xs[columns.y[0]] = columns.x[0];
+		xs['highlightY'] = 'highlightX';
+		options['data']['xs'] = xs;
+		console.log(xs);
+		var chart = c3.generate(options);
+		}
+		
+		function createChart()
+		{
+			columns = getColumns(xCategory, xVarName, yCategory, yVarName);
+		console.log(columns);
+		
+		xLookup = {};
 		$.each(columns.x, function( index, value ) {
 			if (index > 0)
 			{
@@ -106,7 +187,10 @@
             columns.x,
             columns.y
         ],
-        type: 'scatter'
+        type: 'scatter',
+		onclick: function (d, i) { 
+			var countryClicked = xLookup[d.x];
+			console.log(countryClicked); },
 		},
 		tooltip: {
 		contents: function(d, defaultTitleFormat, defaultValueFormat, color)
@@ -117,7 +201,7 @@
 		}
 		},
 		legend: {
-			show: false
+			show: true
 		},
 		point: { r: 8 },
 		axis: {
@@ -141,6 +225,7 @@
 		}
 		
 		createChart();
+		//highlightCountry("New Zealand");
 	</script>
 	
 	
